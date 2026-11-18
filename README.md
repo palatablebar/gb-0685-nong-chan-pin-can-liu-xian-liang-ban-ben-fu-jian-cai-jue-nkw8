@@ -8,7 +8,7 @@
 docker compose up --build -d
 ```
 
-访问 http://localhost:18254 。初次启动自动运行脏样例，可切换 clean.csv 与 legacy.csv。顶部“运行批次”会重新计算，同源输入复用批次。
+访问 http://localhost:18254 。初次启动自动运行脏样例，可切换 clean.csv、legacy.csv 与 group.csv。顶部“运行批次”会重新计算，同源输入复用批次。
 
 ## 业务模块
 
@@ -22,7 +22,7 @@ docker compose up --build -d
 
 ## 核心规则
 
-按采样日期选择有效限量，低于检出限保留区间；复检不得越过样本关联与方法适用范围。完整数值、边界和异常定义见 `docs/DATA-DICTIONARY.md`。
+按采样日期选择有效限量，低于检出限保留区间；复检不得越过样本关联与方法适用范围。残留物组按复检链深度在同一检测轮次内做 Decimal 区间求和，分批复检未齐套时保留共同齐套轮次的旧版组结论，不跨批拼凑。完整数值、边界和异常定义见 `docs/DATA-DICTIONARY.md`。
 
 ## 验证
 

@@ -32,6 +32,9 @@
 | TRAP-15 | ug/kg与mg/kg | 差1000倍 | 浓度统一mg/kg | `app/modules/m4_segments/rules.py` | `tests/test_segments.py::test_unit_conversion` |
 | TRAP-25 | 标准时间边界 | 双版或错版 | 采样日半开区间选版 | `app/modules/m3_versions/standards.py` | `tests/test_versions.py::test_halfopen_effective` |
 | TRAP-20 | 复检引用环 | 遍历无法结束 | 引用路径检测 | `app/modules/m5_calculate/rules.py` | `tests/test_calculate.py::test_cycle_rejected` |
+| TRAP-30 | 组级跨复检批拼凑 | 取各组分最新值出组结论 | 复检链深度同轮次裁决，深度不齐保留共同齐套轮次 | `app/modules/m5_calculate/groups.py` | `tests/test_groups.py::test_partial_retest_keeps_previous_group_conclusion` |
+| TRAP-31 | 多轮复检深度混淆 | 二值初检/复检标签误判同轮 | 按 relation 跳数界定轮次 | `app/modules/m5_calculate/groups.py` | `tests/test_groups.py::test_multi_hop_retest_rounds_are_not_patched` |
+| TRAP-32 | 组总量浮点累计 | float求和失准 | Decimal区间求和 | `app/modules/m5_calculate/groups.py` | `tests/test_groups.py::test_interval_components_sum_with_interval_arithmetic` |
 
 ## 对账规则
 

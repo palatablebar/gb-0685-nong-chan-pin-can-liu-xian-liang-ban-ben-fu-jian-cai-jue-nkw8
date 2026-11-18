@@ -1,6 +1,7 @@
 from collections import defaultdict
 from decimal import Decimal
 from app.errors import DomainError
+from app.modules.m5_calculate.groups import adjudicate_groups, group_definitions
 
 def select_reports(reports):
     versions={}
@@ -45,5 +46,11 @@ def apply(state):
         if r['id'] in bad:
             lines.add(r['_line']);state['quarantine'].append({'line':r['_line'],'id':r['id'],'code':bad[r['id']],'raw':r['_raw']})
     state['rows']=[r for r in state['rows'] if r['_line'] not in lines]
-    calculations=[{'id':r['id'],'line':r['_line'],'sample_id':r['sample_id'],'batch':r['batch'],'analyte':r['analyte'],'method':r['method'],'standard':r['standard_id'],'lower':r['lower'],'upper':r['upper'],'upper_exclusive':r['upper_exclusive'],'limit':r['limit'],'code':r['code'],'replaces':r['relation']} for r in chosen if r['id'] not in bad]
-    state['calculations']=calculations;state['business']={'total':len(calculations),'pass':sum(r['code']=='PASS' for r in calculations),'fail':sum(r['code']=='FAIL' for r in calculations),'uncertain':sum(r['code']=='UNCERTAIN' for r in calculations),'unit':'检测项目'};return state
+    calculations=[{'id':r['id'],'line':r['_line'],'sample_id':r['sample_id'],'batch':r['batch'],'product':r['product'],'analyte':r['analyte'],'method':r['method'],'standard':r['standard_id'],'lower':r['lower'],'upper':r['upper'],'upper_exclusive':r['upper_exclusive'],'limit':r['limit'],'code':r['code'],'replaces':r['relation']} for r in chosen if r['id'] not in bad]
+    state['calculations']=calculations;state['business']={'total':len(calculations),'pass':sum(r['code']=='PASS' for r in calculations),'fail':sum(r['code']=='FAIL' for r in calculations),'uncertain':sum(r['code']=='UNCERTAIN' for r in calculations),'unit':'检测项目'}
+    # 残留物组裁决：只在已采纳报告（含复检替代关系）之上重算，不触碰原始组分记录。
+    # roots 保留全部有效报告（含被复检替代的初检根报告），用于还原上一版完整轮次组结论。
+    roots={r['id']:r for r in state['measurements'] if r['id'] not in bad}
+    state['group_definitions']=group_definitions()
+    state['group_verdicts'],state['group_business']=adjudicate_groups(calculations,state['group_definitions'],roots)
+    return state
